@@ -54,3 +54,7 @@ class JSONSchemaField(forms.CharField):
         css = {
             'all': ('http://www.alpacajs.org/css/alpaca.min.css',)
         }
+
+#CONSIDER: a JSONSchemaForm that has a schema attribute and constructs the appropriate base_fields with JSONSchemaFields for the complex subfields.
+#class MyForm(JSONSchemaForm): schema=schema; afield=forms.CharField()
+#model forms infer that we should save these values and should be custom, likely utilizing a single JSONSchemaField
