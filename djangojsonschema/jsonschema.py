@@ -1,6 +1,12 @@
 #TODO find a better submodule name
-from django.forms import widgets
+from django.forms import widgets, fields
 
+
+def pretty_name(name):
+    """Converts 'first_name' to 'First name'"""
+    if not name:
+        return u''
+    return name.replace('_', ' ').capitalize()
 
 class DjangoFormToJSONSchema(object):
     def convert_form(self, form, json_schema=None):
@@ -13,26 +19,51 @@ class DjangoFormToJSONSchema(object):
             }
         #CONSIDER: base_fields when given a class, fields for when given an instance
         for name, field in form.base_fields.iteritems():
-            json_schema['properties'][name] = self.convert_formfield(field, json_schema)
+            json_schema['properties'][name] = self.convert_formfield(name, field, json_schema)
         return json_schema
     
-    def convert_formfield(self, field, json_schema):
+    input_type_map = {
+        'text': 'string',
+    }
+    
+    def convert_formfield(self, name, field, json_schema):
+        #TODO detect bound field
+        widget = field.widget
         target_def = {
-            'title': field.label,
+            'title': field.label or pretty_name(name),
             'description': field.help_text,
             'required': field.required,
         }
-        widget = field.field.widget
-        if isinstance(widget, widgets.Input):
-            target_def['type'] = widget.input_type
+        if isinstance(field, fields.URLField):
+            target_def['type'] = 'string'
+            target_def['format'] = 'url'
+        elif isinstance(field, fields.FileField):
+            target_def['type'] = 'string'
+            target_def['format'] = 'uri'
+        elif isinstance(field, fields.DateField):
+            target_def['type'] = 'string'
+            target_def['format'] = 'date'
+        elif isinstance(field, fields.DateTimeField):
+            target_def['type'] = 'string'
+            target_def['format'] = 'datetime'
+        elif isinstance(field, (fields.DecimalField, fields.FloatField)):
+            target_def['type'] = 'number'
+        elif isinstance(field, fields.IntegerField):
+            target_def['type'] = 'integer'
+        elif isinstance(field, fields.EmailField):
+            target_def['type'] = 'string'
+            target_def['format'] = 'email'
         elif isinstance(widget, widgets.CheckboxInput):
             target_def['type'] = 'boolean'
         elif isinstance(widget, widgets.Select):
             if widget.allow_multiple_selected:
-                target_def['type'] = 'string'
-            else:
                 target_def['type'] = 'array'
+            else:
+                target_def['type'] = 'string'
             target_def['enum'] = [choice[0] for choice in field.choices]
+        elif isinstance(widget, widgets.Input):
+            translated_type = self.input_type_map.get(widget.input_type, 'string')
+            target_def['type'] = translated_type
         else:
             target_def['type'] = 'string'
         return target_def
@@ -54,15 +85,14 @@ class DocKitSchemaToJSONSchema(DjangoFormToJSONSchema):
                 'properties':{}, #TODO SortedDict
             }
         for key, field in dockit_schema._meta.fields.iteritems():
-            self.convert_dockitfield(field, json_schema)
+            json_schema['properties'][key] = self.convert_dockitfield(key, field, json_schema)
         return json_schema
     
-    def convert_dockitfield(self, field, json_schema):
+    def convert_dockitfield(self, name, field, json_schema):
         #if simple field, get the form field
         if True: #TODO is simple
             formfield = field.formfield()
             return self.convert_formfield(formfield, json_schema)
         #else: #complex stuff
         target_def = {}
-        json_schema['properties'][field.name] = target_def
 
