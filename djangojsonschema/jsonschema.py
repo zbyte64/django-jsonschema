@@ -32,8 +32,9 @@ class DjangoFormToJSONSchema(object):
         target_def = {
             'title': field.label or pretty_name(name),
             'description': field.help_text,
-            'required': field.required,
         }
+        if field.required:
+            target_def['required'] = [name] #TODO this likely is not correct
         if isinstance(field, fields.URLField):
             target_def['type'] = 'string'
             target_def['format'] = 'url'
@@ -53,6 +54,8 @@ class DjangoFormToJSONSchema(object):
         elif isinstance(field, fields.EmailField):
             target_def['type'] = 'string'
             target_def['format'] = 'email'
+        elif isinstance(field, fields.NullBooleanField):
+            target_def['type'] = 'boolean'
         elif isinstance(widget, widgets.CheckboxInput):
             target_def['type'] = 'boolean'
         elif isinstance(widget, widgets.Select):
