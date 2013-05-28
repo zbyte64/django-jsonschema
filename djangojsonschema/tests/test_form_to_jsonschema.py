@@ -37,7 +37,7 @@ class TestForm(forms.Form):
 class FormToJsonSchemaTestCase(unittest.TestCase):
     def setUp(self):
         self.encoder = DjangoFormToJSONSchema()
-    
+
     def test_convert_form(self):
         form_repr = self.encoder.convert_form(TestForm)
         print form_repr
@@ -51,7 +51,7 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             raise
         instance_form_repr = self.encoder.convert_form(TestForm())
         check_schema(instance_form_repr)
-    
+
     def test_convert_charfield(self):
         name = 'a_charfield'
         ideal_repr = {
@@ -59,12 +59,12 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             'type': 'string',
             'description': u'Any string',
             'title': 'A charfield',
-        } 
+        }
         field = TestForm.base_fields[name]
         json_schema = {'properties':{}}
         schema_repr = self.encoder.convert_formfield(name, field, json_schema)
         self.assertEqual(schema_repr, ideal_repr)
-    
+
     def test_convert_charfield(self):
         #CONSIDER: the json spec doesn't define a textarea, this is an option of alpacajs
         name = 'a_textarea'
@@ -73,12 +73,12 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             'type': 'string',
             'description': u'Any paragraph',
             'title': 'A textarea',
-        } 
+        }
         field = TestForm.base_fields[name]
         json_schema = {'properties':{}}
         schema_repr = self.encoder.convert_formfield(name, field, json_schema)
         self.assertEqual(schema_repr, ideal_repr)
-    
+
     def test_convert_urlfield(self):
         name = 'url'
         ideal_repr = {
@@ -87,12 +87,12 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             'format': 'url',
             'description': u'',
             'title': 'Url',
-        } 
+        }
         field = TestForm.base_fields[name]
         json_schema = {'properties':{}}
         schema_repr = self.encoder.convert_formfield(name, field, json_schema)
         self.assertEqual(schema_repr, ideal_repr)
-    
+
     def test_convert_booleanfield(self):
         name = 'a_boolean'
         ideal_repr = {
@@ -100,12 +100,12 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             'type': 'boolean',
             'description': u'',
             'title': 'A boolean',
-        } 
+        }
         field = TestForm.base_fields[name]
         json_schema = {'properties':{}}
         schema_repr = self.encoder.convert_formfield(name, field, json_schema)
         self.assertEqual(schema_repr, ideal_repr)
-    
+
     def test_convert_select_option(self):
         name = 'select_option'
         ideal_repr = {
@@ -114,12 +114,12 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             'description': u'',
             'title': 'Select option',
             'enum': ['first', 'second'],
-        } 
+        }
         field = TestForm.base_fields[name]
         json_schema = {'properties':{}}
         schema_repr = self.encoder.convert_formfield(name, field, json_schema)
         self.assertEqual(schema_repr, ideal_repr)
-    
+
     def test_convert_date(self):
         name = 'a_date'
         ideal_repr = {
@@ -128,12 +128,12 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             'format': 'date',
             'description': u'',
             'title': 'A date',
-        } 
+        }
         field = TestForm.base_fields[name]
         json_schema = {'properties':{}}
         schema_repr = self.encoder.convert_formfield(name, field, json_schema)
         self.assertEqual(schema_repr, ideal_repr)
-    
+
     def test_convert_datetime(self):
         name = 'a_datetime'
         ideal_repr = {
@@ -142,12 +142,12 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             'format': 'datetime',
             'description': u'',
             'title': 'A datetime',
-        } 
+        }
         field = TestForm.base_fields[name]
         json_schema = {'properties':{}}
         schema_repr = self.encoder.convert_formfield(name, field, json_schema)
         self.assertEqual(schema_repr, ideal_repr)
-    
+
     def test_convert_decimal(self):
         name = 'a_decimal'
         ideal_repr = {
@@ -155,12 +155,12 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             'type': 'number',
             'description': u'',
             'title': 'A decimal',
-        } 
+        }
         field = TestForm.base_fields[name]
         json_schema = {'properties':{}}
         schema_repr = self.encoder.convert_formfield(name, field, json_schema)
         self.assertEqual(schema_repr, ideal_repr)
-    
+
     def test_convert_email(self):
         name = 'an_email'
         ideal_repr = {
@@ -169,12 +169,12 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             'format': 'email',
             'description': u'',
             'title': 'An email',
-        } 
+        }
         field = TestForm.base_fields[name]
         json_schema = {'properties':{}}
         schema_repr = self.encoder.convert_formfield(name, field, json_schema)
         self.assertEqual(schema_repr, ideal_repr)
-    
+
     def test_convert_file(self):
         name = 'a_file'
         ideal_repr = {
@@ -183,12 +183,12 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             'format': 'uri',
             'description': u'',
             'title': 'A file',
-        } 
+        }
         field = TestForm.base_fields[name]
         json_schema = {'properties':{}}
         schema_repr = self.encoder.convert_formfield(name, field, json_schema)
         self.assertEqual(schema_repr, ideal_repr)
-    
+
     def test_convert_float(self):
         name = 'a_float'
         ideal_repr = {
@@ -196,12 +196,12 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             'type': 'number',
             'description': u'',
             'title': 'A float',
-        } 
+        }
         field = TestForm.base_fields[name]
         json_schema = {'properties':{}}
         schema_repr = self.encoder.convert_formfield(name, field, json_schema)
         self.assertEqual(schema_repr, ideal_repr)
-    
+
     def test_convert_integer(self):
         name = 'an_integer'
         ideal_repr = {
@@ -209,7 +209,7 @@ class FormToJsonSchemaTestCase(unittest.TestCase):
             'type': 'integer',
             'description': u'',
             'title': 'An integer',
-        } 
+        }
         field = TestForm.base_fields[name]
         json_schema = {'properties':{}}
         schema_repr = self.encoder.convert_formfield(name, field, json_schema)
