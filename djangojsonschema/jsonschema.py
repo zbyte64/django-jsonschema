@@ -21,11 +21,11 @@ class DjangoFormToJSONSchema(object):
         for name, field in form.base_fields.iteritems():
             json_schema['properties'][name] = self.convert_formfield(name, field, json_schema)
         return json_schema
-    
+
     input_type_map = {
         'text': 'string',
     }
-    
+
     def convert_formfield(self, name, field, json_schema):
         #TODO detect bound field
         widget = field.widget
@@ -71,7 +71,7 @@ class DjangoFormToJSONSchema(object):
         else:
             target_def['type'] = 'string'
         return target_def
-        
+
 class DjangoModelToJSONSchema(DjangoFormToJSONSchema):
     def convert_model(self, model, json_schema=None):
         model_form = None #TODO convert to model form
@@ -91,7 +91,7 @@ class DocKitSchemaToJSONSchema(DjangoFormToJSONSchema):
         for key, field in dockit_schema._meta.fields.iteritems():
             json_schema['properties'][key] = self.convert_dockitfield(key, field, json_schema)
         return json_schema
-    
+
     def convert_dockitfield(self, name, field, json_schema):
         #if simple field, get the form field
         if True: #TODO is simple
