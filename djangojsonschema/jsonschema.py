@@ -1,6 +1,6 @@
 #TODO find a better submodule name
 from django.forms import widgets, fields
-
+import inspect
 
 def pretty_name(name):
     """Converts 'first_name' to 'First name'"""
@@ -17,8 +17,14 @@ class DjangoFormToJSONSchema(object):
                 'type':'object',
                 'properties':{}, #TODO SortedDict
             }
-        #CONSIDER: base_fields when given a class, fields for when given an instance
-        for name, field in form.base_fields.iteritems():
+        fields = form.base_fields
+
+        # If a Form instance is given, use the 'fields' attribute if it exists
+        # since instances are allowed to modify them.
+        if not inspect.isclass(form) and hasattr(form, 'fields'):
+            fields = form.fields
+
+        for name, field in fields.iteritems():
             json_schema['properties'][name] = self.convert_formfield(name, field, json_schema)
         return json_schema
 
