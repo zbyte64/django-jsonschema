@@ -11,7 +11,6 @@ def pretty_name(name):
 class DjangoFormToJSONSchema(object):
     def convert_form(self, form, json_schema=None):
         if json_schema is None:
-            print 'json_schema is none'
             json_schema = {
                 #'title':dockit_schema._meta
                 #'description'
@@ -20,7 +19,6 @@ class DjangoFormToJSONSchema(object):
                 'required':[], #required fields should be in here
             }
         #CONSIDER: base_fields when given a class, fields for when given an instance
-        print 'json schema is', json_schema
         for name, field in form.base_fields.iteritems():
             json_schema['properties'][name] = self.convert_formfield(name, field, json_schema)
             if field.required:
