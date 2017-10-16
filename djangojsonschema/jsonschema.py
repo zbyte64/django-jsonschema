@@ -16,10 +16,13 @@ class DjangoFormToJSONSchema(object):
                 #'description'
                 'type':'object',
                 'properties':{}, #TODO SortedDict
+                'required':[], #required fields should be in here
             }
         #CONSIDER: base_fields when given a class, fields for when given an instance
         for name, field in form.base_fields.iteritems():
             json_schema['properties'][name] = self.convert_formfield(name, field, json_schema)
+            if field.required:
+                json_schema['required'].append(name)
         return json_schema
     
     input_type_map = {
@@ -33,8 +36,8 @@ class DjangoFormToJSONSchema(object):
             'title': field.label or pretty_name(name),
             'description': field.help_text,
         }
-        if field.required:
-            target_def['required'] = [name] #TODO this likely is not correct
+        # if field.required:                  #removed since it is not correct
+        #     target_def['required'] = [name] #TODO this likely is not correct
         #TODO JSONSchemaField; include subschema and ref the type
         if isinstance(field, fields.URLField):
             target_def['type'] = 'string'
