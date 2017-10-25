@@ -1,6 +1,6 @@
 #TODO find a better submodule name
 from django.forms import widgets, fields
-
+import inspect
 
 def pretty_name(name):
     """Converts 'first_name' to 'First name'"""
@@ -18,17 +18,23 @@ class DjangoFormToJSONSchema(object):
                 'properties':{}, #TODO SortedDict
                 'required':[], #required fields should be in here
             }
-        #CONSIDER: base_fields when given a class, fields for when given an instance
-        for name, field in form.base_fields.iteritems():
+        fields = form.base_fields
+
+        # If a Form instance is given, use the 'fields' attribute if it exists
+        # since instances are allowed to modify them.
+        if not inspect.isclass(form) and hasattr(form, 'fields'):
+            fields = form.fields
+
+        for name, field in fields.iteritems():
             json_schema['properties'][name] = self.convert_formfield(name, field, json_schema)
             if field.required:
                 json_schema['required'].append(name)
         return json_schema
-    
+
     input_type_map = {
         'text': 'string',
     }
-    
+
     def convert_formfield(self, name, field, json_schema):
         #TODO detect bound field
         widget = field.widget
@@ -74,7 +80,7 @@ class DjangoFormToJSONSchema(object):
         else:
             target_def['type'] = 'string'
         return target_def
-        
+
 class DjangoModelToJSONSchema(DjangoFormToJSONSchema):
     def convert_model(self, model, json_schema=None):
         model_form = None #TODO convert to model form
@@ -94,7 +100,7 @@ class DocKitSchemaToJSONSchema(DjangoFormToJSONSchema):
         for key, field in dockit_schema._meta.fields.iteritems():
             json_schema['properties'][key] = self.convert_dockitfield(key, field, json_schema)
         return json_schema
-    
+
     def convert_dockitfield(self, name, field, json_schema):
         #if simple field, get the form field
         if True: #TODO is simple
